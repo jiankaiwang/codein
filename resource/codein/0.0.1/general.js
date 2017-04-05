@@ -265,7 +265,7 @@ function searchCodeInHostIP() {
 	// show initial check
 	showExecIcon("init", "on");
 	
-	var win7Net = new RangeOfIPv4Addr("192.168.98.100","255.255.255.252",true);
+	var win7Net = new RangeOfIPv4Addr("192.168.99.100","255.255.255.252",true);
 	var win10orLinux = new RangeOfIPv4Addr("172.17.0.2","255.255.255.240",true);
 	defaultIP = win7Net.showAllIPAddress()["data"].concat(win10orLinux.showAllIPAddress()["data"]);
         defaultIPAddr = win7Net.showAllIPAddress()["data"].concat(win10orLinux.showAllIPAddress()["data"]);
