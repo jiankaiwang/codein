@@ -4,6 +4,11 @@
 var execEnv = "/api/exec.php";
 var execEnvAvailableFlag = false;
 var egCodeId = "helloworld";
+var defaultIP = [];
+var defaultIPAddr = [];
+var allIPReport = [];
+var allReportRes = [];
+var cloudAPIFlag = 0;
 
 /*
  * desc : global setting
@@ -214,12 +219,72 @@ function exportFile() {
 }
 
 /*
- * desc : show selected parameters
+ * desc : main body to check all default IP addresses in series
+ * call : searchCodeInHostIP()
  */
-function showParas() {
+function checkIPBody(index) {
+	$.ajax({
+		type: "GET",
+		url: defaultIP[index],
+		dataType: 'json',
+		data: '',
+		timeout: 1000,
+		success: function(data) {
+			if("response" in data && data.response.length > 0) {
+				// the correct response
+				allIPReport[index] = 1;
+			} else {
+				// response is not correct
+				allIPReport[index] = 0;
+				if((index + 1) > defaultIP.length) {
+					return ;
+				} else {
+					checkIPBody(index + 1);
+				}
+			}
+		},
+		error: function(data) {
+			// error or timeout
+			allIPReport[index] = 0;
+			if((index + 1) > defaultIP.length) {
+				return ;
+			} else {
+				checkIPBody(index + 1);
+			}
+		}
+	});
+}
+
+/*
+ * desc: scan the activated IP Address on docker
+ * note :
+ * |- windwos 7 : 192.168.99.100 ~ 192.168.99.104
+ * |- windwos 10 / linux : 172.17.0.2 ~ 172.17.0.6
+ */
+function searchCodeInHostIP() {
 	// show initial check
 	showExecIcon("init", "on");
 	
+	var win7Net = new RangeOfIPv4Addr("192.168.98.100","255.255.255.252",true);
+	var win10orLinux = new RangeOfIPv4Addr("172.17.0.2","255.255.255.240",true);
+	defaultIP = win7Net.showAllIPAddress()["data"].concat(win10orLinux.showAllIPAddress()["data"]);
+        defaultIPAddr = win7Net.showAllIPAddress()["data"].concat(win10orLinux.showAllIPAddress()["data"]);
+	allIPReport = [];
+	
+	// concat strings for IP check
+	for(var i = 0 ; i < defaultIP.length ; i++) {
+		defaultIP[i] = "http://" + defaultIP[i] + execEnv;
+		allIPReport.push(-1);
+	}
+	
+	// start to send request for all IP	
+	checkIPBody(0);
+}
+
+/*
+ * desc : show selected parameters
+ */
+function showParas() {	
 	$.ajax({
 		type: "GET",
 		url: execEnv,
@@ -227,34 +292,62 @@ function showParas() {
 		data: '',
 		timeout: 5000,
 		success: function(data) {
-			showExecIcon("init", "off");
-			
 			if("response" in data && data.response.length > 0) {
-				var showInitCheck = ["Swift Version " + $('#version-selector').val(), $('#env-selector').val()];
-				var showResStr = "";
-				for(var i = 0 ; i < showInitCheck.length; i++) {
-					showResStr += showInitCheck[i] + "<br>";
-				}
-				$('#execution_result').html(showResStr);
+                                showExecIcon("init","off");
+
+				var showMsg = ["Swift Version " + $('#version-selector').val(), $('#env-selector').val()];
+				showMsgOnView(showMsg);
 				
 				// set the flag to indicate the execution can begin
 				execEnvAvailableFlag = true;
+
+                                // other message
+                        	if(allReportRes.length > 0) {
+					// the codein entity found
+					var showMsg = [
+						'CodeIn service is hosted on IP <mark class="tip">' + defaultIPAddr[allReportRes[0]] + '</mark>.' 
+					];
+					showMsgOnView(showMsg);
+
+                                        // cloud api oauth is allowed
+                                        cloudAPIFlag = 1;
+                                        redirect_uri = "http://" + defaultIPAddr[allReportRes[0]];
+                                        github_app_redirect = redirect_uri;
+				} else {
+					// there is no codein entity found
+					var showMsg = [
+						'<mark class="error">Both Dropbox and Github APIs are temporarily nonfunctional.</mark>', 
+						'<mark class="tip">The IP address of CodeIn service is not in the default range.</mark>',
+						'The accepted IP addresses are 192.168.99.100/30 (Win7) and 172.17.0.2/28 (Win10,Linux).'
+					];
+					showMsgOnView(showMsg);
+
+                                        // oauth is not allowed
+                                        cloudAPIFlag = 0;
+                                        redirect_uri = "";
+                                        github_app_redirect = "";
+
+                                        // notify the user
+                                        $('#service-dropbox button.start-oauth').removeClass("btn-primary");
+                                        $('#service-github button.start-oauth').removeClass("btn-primary");
+
+                                        // remove the button and its function
+                                        $('#service-dropbox button.start-oauth').attr('onclick', "");
+                                        $('#service-github button.start-oauth').attr('onclick', "");
+                                        
+				}
 			}
 		},
 		error: function(data) {
 			showExecIcon("init", "off");
 			
-			var showInitCheck = [
+			var showMsg = [
 				'<mark class="error">Docker execution environment is error</mark>.', 
 				'Make sure the <mark class="tip">execution url</mark> is correct.',
 				'',
 				'Note : Check the variable "execEnv" at line.4 on general.js.'
 			];
-			var showResStr = "";
-			for(var i = 0 ; i < showInitCheck.length; i++) {
-				showResStr += showInitCheck[i] + "<br>";
-			}
-			$('#execution_result').html(showResStr);
+			showMsgOnView(showMsg);
 			
 			// set the flag to indicate no execution is allowed
 			execEnvAvailableFlag = false;
@@ -308,6 +401,20 @@ function setEGCodeId(getID) {
 }
 
 /*
+ * desc : show tip on the execution view
+ * inpt :
+ * |- showMsg : a list contains each line of messages
+ * retn : None
+ */
+function showMsgOnView(showMsg) {
+	var showResStr = $('#execution_result').html();
+	for(var i = 0 ; i < showMsg.length; i++) {
+		showResStr += showMsg[i] + "<br>";
+	}
+	$('#execution_result').html(showResStr);	
+}
+ 
+/*
  * desc : fetch example codes
  */
 function fetchExampleCode() {
@@ -359,27 +466,54 @@ function prepareCloudService() {
 }
 
 /*
+ * desc : all initial processes
+ */
+function allInitProcesses() {
+	allReportRes = [];
+
+	// check network configure per 3 seconds
+	setTimeout(function(){
+
+		allReportRes = allItemIndexinList(allIPReport, 1);
+		
+		if(allIPReport.indexOf(-1) < 0 || allReportRes.length > 0) {
+			// there are some IP waited for checking
+			
+			// initial check and show selected parameters
+			showParas();
+			
+			// initialize editor
+			setEditorEnv();
+			
+			// activate when editor is edited
+			editor.getSession().on('change', function(e) {
+				// remove the error marker when editing the line
+				removeLineMarker("partial");
+			});
+			
+			// initial cloud service
+			initialDropboxService();
+			
+			// initial github service
+			initialGithubService();
+
+		} else {
+			// continue to check network
+			allInitProcesses();
+		}
+
+	}, 2000);	
+}
+
+/*
  * desc : initialization
  */
 $(function() {
-	// initial check and show selected parameters
-	showParas();
 	
-	// initialize editor
-	setEditorEnv();
+	// start network configuration
+	searchCodeInHostIP();
 	
-	// activate when editor is edited
-	editor.getSession().on('change', function(e) {
-		// remove the error marker when editing the line
-		removeLineMarker("partial");
-	});
-	
-	// initial cloud service
-	initialDropboxService();
-	
-	// initial github service
-	initialGithubService();
-	
-
+	// start initial processes
+	allInitProcesses();
 	
 });
