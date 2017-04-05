@@ -5,8 +5,10 @@ var execEnv = "/api/exec.php";
 var execEnvAvailableFlag = false;
 var egCodeId = "helloworld";
 var defaultIP = [];
+var defaultIPAddr = [];
 var allIPReport = [];
 var allReportRes = [];
+var cloudAPIFlag = 0;
 
 /*
  * desc : global setting
@@ -263,9 +265,10 @@ function searchCodeInHostIP() {
 	// show initial check
 	showExecIcon("init", "on");
 	
-	var win7Net = new RangeOfIPv4Addr("192.168.99.100","255.255.255.252",true);
+	var win7Net = new RangeOfIPv4Addr("192.168.98.100","255.255.255.252",true);
 	var win10orLinux = new RangeOfIPv4Addr("172.17.0.2","255.255.255.240",true);
 	defaultIP = win7Net.showAllIPAddress()["data"].concat(win10orLinux.showAllIPAddress()["data"]);
+        defaultIPAddr = win7Net.showAllIPAddress()["data"].concat(win10orLinux.showAllIPAddress()["data"]);
 	allIPReport = [];
 	
 	// concat strings for IP check
@@ -299,25 +302,40 @@ function showParas() {
 				execEnvAvailableFlag = true;
 
                                 // other message
-                        if(allReportRes.length > 0) {
-				// the codein entity found
-				
-				if(allReportRes.length > 1) {			
-					// there are more than 1 codein found
+                        	if(allReportRes.length > 0) {
+					// the codein entity found
 					var showMsg = [
-						'<mark class="error">Is codein execution environment duplicated</mark>?' 
+						'CodeIn service is hosted on IP <mark class="tip">' + defaultIPAddr[allReportRes[0]] + '</mark>.' 
 					];
 					showMsgOnView(showMsg);
+
+                                        // cloud api oauth is allowed
+                                        cloudAPIFlag = 1;
+                                        redirect_uri = "http://" + defaultIPAddr[allReportRes[0]];
+                                        github_app_redirect = redirect_uri;
+				} else {
+					// there is no codein entity found
+					var showMsg = [
+						'<mark class="error">Both Dropbox and Github APIs are temporarily nonfunctional.</mark>', 
+						'<mark class="tip">The IP address of CodeIn service is not in the default range.</mark>',
+						'The accepted IP addresses are 192.168.99.100/30 (Win7) and 172.17.0.2/28 (Win10,Linux).'
+					];
+					showMsgOnView(showMsg);
+
+                                        // oauth is not allowed
+                                        cloudAPIFlag = 0;
+                                        redirect_uri = "";
+                                        github_app_redirect = "";
+
+                                        // notify the user
+                                        $('#service-dropbox button.start-oauth').removeClass("btn-primary");
+                                        $('#service-github button.start-oauth').removeClass("btn-primary");
+
+                                        // remove the button and its function
+                                        $('#service-dropbox button.start-oauth').attr('onclick', "");
+                                        $('#service-github button.start-oauth').attr('onclick', "");
+                                        
 				}
-			} else {
-				// there is no codein entity found
-				var showMsg = [
-					'<mark class="error">Both Dropbox and Github APIs are temporarily nonfunctional.</mark>', 
-					'<mark class="tip">The IP address of CodeIn service is not in the default range.</mark>',
-					'The accepted IP addresses are 192.168.99.100/30 (Win7) and 172.17.0.2/28 (Win10,Linux).'
-				];
-				showMsgOnView(showMsg);
-			}
 			}
 		},
 		error: function(data) {

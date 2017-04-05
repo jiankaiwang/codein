@@ -25,6 +25,10 @@ var allowGistDelete = 0;
  * retn : a code used in further /oauth2/token
  */
 function githubAuthorizeOnToken() {
+        if(cloudAPIFlag == 0) {
+            return ;
+        }
+
 	window.location.href = 
 		"https://github.com/login/oauth/authorize?scope=" + github_app_scope 
 		+ "&client_id=" + github_app_clientId 
