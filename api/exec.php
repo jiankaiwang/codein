@@ -131,11 +131,7 @@ class REQUESTMETHOD {
             } 
         } else {
             $getData = shell_exec("swift --version");
-            $getHostIP = shell_exec("ifconfig");
-            $this -> response["response"] = array(
-                "swiftver" => $getData,
-                "hostIP" => $getHostIP
-            );
+            $this -> response["response"] = $getData;
         }
         return;
     }
