@@ -3,7 +3,7 @@
  */
 var github_app_clientId = "fd7fa72320d54551b26c";
 var github_app_scope = "gist,user";
-var github_app_redirect = "http://localhost/index.html";
+var github_app_redirect = "http://localhost:12280/index.html";
 var github_auth_code = "";
 var github_auth_token = "";
 var gistConnector = "/api/GistAPI.php";
