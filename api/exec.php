@@ -173,7 +173,7 @@ class REQUESTMETHOD {
                     switch($_POST["version"]) {
                         default:
                         case "3.0.2-Released":
-                            $execPid = Shell_exec(sprintf("%s > %s 2>&1 & echo $!","/usr/src/swift-3.0.2-RELEASE-ubuntu16.04/usr/bin/swift ".$execFile, $execResFile));
+                            $execPid = Shell_exec(sprintf("%s > %s 2>&1 & echo $!","/usr/bin/swift ".$execFile, $execResFile));
                             $execBeginTime = time();
                             break; 
                     }
