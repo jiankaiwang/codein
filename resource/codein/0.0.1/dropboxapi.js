@@ -3,7 +3,7 @@
  * type : Dropbox Folder Only
  */
 var app_clientID = "1zq5d396qplohif";
-var redirect_uri = "http://localhost/index.html";
+var redirect_uri = "http://localhost:12280/index.html";
 var dropboxCode = "";
 var DropboxConnector = "/api/DropboxAPI.php";
 var dropboxAllowSaveFlag = 0;
