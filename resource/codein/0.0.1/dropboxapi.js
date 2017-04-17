@@ -17,11 +17,6 @@ var dropboxDeleteFilename = "";
  * retn : a code used in further /oauth2/token
  */
 function dropboxAuthorizeOnToken() {
-        if(cloudAPIFlag == 0) {
-            // no cloud API allowed
-            return ;
-        }
-
 	window.location.href = 
 		"https://www.dropbox.com/1/oauth2/authorize?response_type=token&client_id=" + 
 		app_clientID + "&redirect_uri=" + redirect_uri;
