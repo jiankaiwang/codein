@@ -6,12 +6,59 @@ CodeIn provides you a well solution to swift programming. It not only  runs with
 
 CodeIn is a web-based Swift IDE and was developed under PHP 7.0 and Apache 2. It provides you an intuitional and simplifed coding interface. Furthermore, a dropbox and gist api were also embedded to provide you a easy way sharing with the other.
 
-[![Codein Operation](https://img.youtube.com/vi/HypbQUUAUBc/0.jpg)](http://www.youtube.com/watch?v=HypbQUUAUBc "CodeIn")
+[![Codein Operation](https://img.youtube.com/vi/TNa7d47sIzc/0.jpg)](http://www.youtube.com/watch?v=TNa7d47sIzc "CodeIn")
 
 ## Docker
 
-Docker provides lite, high-performance and cross platform 
+The Dockerfile of Codein is hosted on [Github](https://github.com/jiankaiwang/codein) and [docker hub](https://hub.docker.com/r/jiankaiwang/codein/).
 
+**Noteic that ip forwaring from host port 12280 to container port 80 can not be changed due to Dropbox and Gist API rule.**
+
+* CodeIn in Linux (On the terminal)
+
+```bash
+# pull the image from docker hub
+sudo docker pull jiankaiwang/codein:latest
+
+# start the service 
+# -d : run as the daemon
+# -p : port forwarding must be from 12280 (host) to 80 (container)
+# --name : container name
+sudo docker run -d -p 12280:80 --name codein jiankaiwang/codein:latest
+
+# stop CodeIn
+sudo docker stop codein
+```
+
+* CodeIn in Windows 7/8 Toolbox (On the `Docker Quickstart Terminal`)
+
+**Assume that docker is configured to use the `default` machine with IP `192.168.99.100`.** If you are the first time starting CodeIn, you would establish the port forwarding from host to containter by setting the virtualbox interface.
+
+```bash
+# the VM is not running
+VBoxManage modifyvm "default" --natpf1 "codein,tcp,,12280,,12280"
+
+# the VM is running
+VBoxManage controlvm "default" natpf1 "codein,tcp,,12280,,12280"
+```
+
+The following is the command starting CodeIn.
+
+```bash
+# pull the image from docker hub
+docker pull jiankaiwang/codein:latest
+
+# start the service 
+# -d : run as the daemon
+# -p : port forwarding must be from 12280 (host) to 80 (container)
+# --name : container name
+docker run -d -p 12280:80 --name codein jiankaiwang/codein:latest
+
+# stop CodeIn
+docker stop codein
+```
+
+* **After starting CodeIn, borswe the webpage `http://localhost:12280/` by the browser (Chrome, Firefox, IE, Edge, Safari, etc.), and begin to program in swift.**
 
 ## Programming IDE Framework
 
