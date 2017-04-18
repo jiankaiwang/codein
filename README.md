@@ -6,7 +6,7 @@ CodeIn provides you a well solution to swift programming. It not only  runs with
 
 CodeIn is a web-based Swift IDE and was developed under PHP 7.0 and Apache 2. It provides you an intuitional and simplifed coding interface. Furthermore, a dropbox and gist api were also embedded to provide you a easy way sharing with the other.
 
-[![Codein Operation](https://img.youtube.com/vi/TNa7d47sIzc/0.jpg)](http://www.youtube.com/watch?v=TNa7d47sIzc "CodeIn")
+[![Codein Operation](https://raw.githubusercontent.com/jiankaiwang/codein/master/docs/images/codein_v1.gif)](http://www.youtube.com/watch?v=TNa7d47sIzc "CodeIn")
 
 ## Docker
 
