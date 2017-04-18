@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>CodeIn : a cross-platform swift IDE</title>
+	
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="a cross-platform swift IDE based on docker">
+	<meta name="author" content="jiankai wang, https://welcome-jiankaiwang.rhcloud.com/">
+	
+	<link href="/resource/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="/resource/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" />
+	<link href="/resource/bootstrap-select/1.11.2/dist/css/bootstrap-select.css" rel="stylesheet" />
+	<link href="/resource/codein/0.0.1/general.css" rel="stylesheet" type="text/css" />
+	
+	<style type="text/css" media="screen">
+		html {
+			min-height: 100% !important;
+			height: 100%;
+		}
+		body {
+			height: 100%;
+			padding-top: 50px;
+		}
+		.row {
+			height: 100%;
+			min-height: 100%;				
+		}
+		.col-md-6 {
+			height: 100%;
+			min-height: 100%;
+			overflow-y: scroll;
+		}
+		#editor { 
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+	<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand main_navbar_item" href="./">CodeIn</a>
+								<a class="navbar-brand main_navbar_item" href="#" data-toggle="modal" data-target="#myModal">
+									<i class="fa fa-cog" aria-hidden="true"></i> Setting
+								</a>
+								<a class="navbar-brand" href="#" onclick="javascript: executeCodeBody();">
+									<i class="fa fa-play" aria-hidden="true"></i> Run
+								</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+										<li>
+                        <a href="#" data-toggle="modal" data-target="#newFile">
+													<i class="fa fa-file-code-o" aria-hidden="true"></i> New 
+												</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="javascript:exportFile();">
+													<i class="fa fa-download" aria-hidden="true"></i> Export 
+												</a>
+                    </li>
+										<li>
+                        <a 
+													href="#" 
+													data-toggle="modal" 
+													data-target="#cloudapi" 
+													onclick="prepareCloudService();">
+													<i class="fa fa-cloud" aria-hidden="true"></i> Cloud 
+												</a>
+                    </li>
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#showTutorial">
+													<i class="fa fa-file-code-o" aria-hidden="true"></i> Tutorial
+												</a>
+                    </li>
+										<li>
+                        <a href="https://github.com/jiankaiwang/CodeIn">
+													<i class="fa fa-github-alt" aria-hidden="true"></i> Github
+												</a>
+                    </li>
+										<li>
+                        <a href="https://codein.github.com/"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+<div class="row">
+<!-- code editor -->
+<div class="col-md-6 col-code">
+<div id="editor">// example.1 : Let's say "Hello world, Swift!"
+let helloworldstring = "Hello world, Swift!"
+print(helloworldstring)</div>
+</div>
+
+<!-- execution -->
+<div class="col-md-6 col-exec" id="execution_result_container">
+<div id="execution_result"></div>
+</div>
+</div>
+    
+<!-- setting -->		
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" id="show-del-detail-body">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Settings</h4>
+      </div>
+      <div class="modal-body">
+				Language&nbsp;&nbsp;
+				<select class="selectpicker" id="language-selector">
+					<option value="swift" selected>Swift</option>
+				</select>
+				<hr />
+				Version&nbsp;&nbsp;
+				<select class="selectpicker" id="version-selector">
+					<option selected>3.0.2-Released</option>
+				</select>
+				<hr />
+				Environment&nbsp;&nbsp;
+				<select class="selectpicker" id="env-selector">
+					<option selected>Ubuntu 16.04 LTS x86_64</option>
+				</select>
+				<hr />
+				Allowed run time&nbsp;&nbsp;
+				<select class="selectpicker" id="runtime-selector">
+					<option value="long">Long ( &gt;= 60 seconds )</option>
+					<option value="short" selected>Short ( &lt; 60 seconds )</option>
+				</select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tutorial -->
+<div class="modal fade" id="showTutorial" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" id="show-del-detail-body">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Tutorial List</h4>
+      </div>
+      <div class="modal-body" id="tutorial-list">
+				<div class="list-group">
+					<a href="#" class="list-group-item" onclick='setEGCodeId("helloworld");'>HelloWorld.swift</a>
+					<a href="#" class="list-group-item" onclick='setEGCodeId("quickstart");'>QuickStart.swift</a>
+					<a href="#" class="list-group-item" onclick='setEGCodeId("bash");'>ExecBash.swift</a>
+					<a href="#" class="list-group-item" onclick='setEGCodeId("fileioandsort");'>FileIOandSort.swift</a>
+					<a href="#" class="list-group-item" onclick='setEGCodeId("oop");'>Object-Oriented-Programming.swift</a>
+				</div>
+      </div>
+      <div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal" onclick='fetchExampleCode();'>Load</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- new file check -->		
+<div class="modal fade" id="newFile" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" id="show-del-detail-body">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Settings</h4>
+      </div>
+      <div class="modal-body">
+				The content is going to be deleted. Are you sure ?
+      </div>
+      <div class="modal-footer">
+				<button type="button" class="btn btn-warning" data-dismiss="modal" 
+					onclick="javascript: newFile();">New</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- cloud service api -->
+<div class="modal fade" id="cloudapi" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" id="show-del-detail-body">
+    <div class="modal-content">
+		  
+			<div class="modal-header">
+				<ul class="nav nav-pills nav-justified">
+					<li class="active">
+						<a href="#service-dropbox" data-toggle="tab">
+							<i class="fa fa-dropbox" aria-hidden="true"></i> Dropbox
+						</a>
+					</li>
+					<li>
+						<a href="#service-github" data-toggle="tab">
+							<i class="fa fa-github" aria-hidden="true"></i> Gist on Github
+						</a>
+					</li>
+				</ul>
+			</div>
+			
+			<div class="modal-body">
+				<div id="myTabContent" class="tab-content">
+							
+					<!-- Dropbox -->
+					<div class="tab-pane fade active in" id="service-dropbox">
+					
+					
+						<ul class="nav nav-tabs nav-justified">
+							<li class="active">
+								<a class="dropboxOperationToggle" data-toggle="tab" href="#dauth">
+									<i class="fa fa-universal-access" aria-hidden="true"></i> Authorize
+								</a>
+							</li>
+							<li>
+								<a class="dropboxOperation" data-toggle="tab" href="#dsave">
+									<i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+								</a>
+							</li>
+							<li>
+								<a class="dropboxOperation" data-toggle="tab" href="#dload">
+									<i class="fa fa-file-code-o" aria-hidden="true"></i> Load
+								</a>
+							</li>
+							<li>
+								<a class="dropboxOperation" data-toggle="tab" href="#ddelete">
+									<i class="fa fa-trash-o" aria-hidden="true"></i> Delete
+								</a>
+							</li>
+						</ul>
+
+						<div class="tab-content">
+						
+							<!-- dropbox authorization page	-->
+							<div id="dauth" class="tab-pane fade in active">
+								<hr />
+								<div class="row">
+									<div class="col-md-12">
+										<p class="text-center">
+											<i class="fa fa-dropbox fa-3x dropboxIcon " aria-hidden="true"></i>
+										</p>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<p class="text-center">
+											<button type="button" class="btn btn-primary text-center start-oauth"
+												onclick="javascript: dropboxAuthorizeOnToken();">
+												Authorization
+											</button>
+										</p>
+									</div>
+								</div>
+								<hr />
+							</div>
+							<!-- dropbox authorization tab end	-->
+						
+						  <!-- save into the dropbox -->
+							<div id="dsave" class="tab-pane fade">
+							
+								<!-- file list -->
+								<div class="list-group file-list">
+									<!--
+									<a href="#" class="list-group-item" onclick='nameToSaveDropbox(this);'>1.swift</a>
+									<a href="#" class="list-group-item" onclick='nameToSaveDropbox(this);'>2.swift</a>
+									-->
+								</div>
+								
+								<!-- input name -->
+								<div class="input-group">
+									<span class="input-group-addon" id="sizing-addon2">Name</span>
+									<input type="text" class="form-control" id="dropboxFileName" 
+										placeholder="filename.swift" aria-describedby="sizing-addon2" />
+								</div>
+								
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primary" 
+										onclick="saveToDropbox();">
+										Save
+									</button>
+									<button type="button" class="btn btn-default" 
+									  onclick="closeSaveToDropbox();" data-dismiss="modal">
+										Close
+									</button>
+								</div>
+		
+							</div>
+							<!-- save into the dropbox end -->
+							
+							<!-- load a file on dropbox -->
+							<div id="dload" class="tab-pane fade">
+								
+								<!-- file list -->
+								<div class="list-group file-list">
+									<!--
+									<a href="#" class="list-group-item" onclick='loadFromDropbox(this);'>1.swift</a>
+									<a href="#" class="list-group-item" onclick='loadFromDropbox(this);'>2.swift</a>
+									-->
+								</div>
+															
+								<div class="modal-footer">
+									<button type="button" id="loadFromDropboxBtn" class="btn btn-warning" onclick="dropbox_download();">Load</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+								
+							</div>
+							<!-- load a file on dropbox end -->
+							
+							<!-- delete a file on dropbox -->
+							<div id="ddelete" class="tab-pane fade">
+								
+								<!-- file list -->
+								<div class="list-group file-list">
+									<!--
+									<a href="#" class="list-group-item" onclick='deleteFromDropbox(this);'>1.swift</a>
+									<a href="#" class="list-group-item" onclick='deleteFromDropbox(this);'>2.swift</a>
+									-->
+								</div>
+								
+								<!-- check name -->
+								<div class="input-group" id="dropboxDeleteConfirmText">
+									<span class="input-group-addon" id="sizing-addon2">Please enter the deleted file name</span>
+									<input type="text" class="form-control" id="deletedDropboxFileName" placeholder="filename.swift" aria-describedby="sizing-addon2">
+								</div>
+															
+								<div class="modal-footer">
+									<button type="button" id="deleteFromDropboxBtn" class="btn btn-danger" onclick="dropbox_delete();">Delete</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+								
+							</div>
+							<!-- delete a file on dropbox end -->
+							
+						</div>
+						
+					</div>
+					<!-- end of Dropbox -->
+					
+					<!-- Github -->
+					<div class="tab-pane fade" id="service-github">
+					
+						<ul class="nav nav-tabs nav-justified">
+							<li class="active">
+								<a class="gistOperationToggle" data-toggle="tab" href="#gistauth">
+									<i class="fa fa-universal-access" aria-hidden="true"></i> Auth
+								</a>
+							</li>
+							<li>
+								<a class="gistOperation" data-toggle="tab" href="#gistcreate">
+									<i class="fa fa-floppy-o" aria-hidden="true"></i> Create
+								</a>
+							</li>
+							<li>
+								<a class="gistOperation" data-toggle="tab" href="#gistget">
+									<i class="fa fa-file-code-o" aria-hidden="true"></i> Get
+								</a>
+							</li>
+							<li>
+								<a class="gistOperation" data-toggle="tab" href="#gistedit">
+									<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit
+								</a>
+							</li>
+							<li>
+								<a class="gistOperation" data-toggle="tab" href="#gistfork">
+									<i class="fa fa-code-fork" aria-hidden="true"></i> Fork
+								</a>
+							</li>
+							<li>
+								<a class="gistOperation" data-toggle="tab" href="#gistdelete">
+									<i class="fa fa-trash-o" aria-hidden="true"></i> Delete
+								</a>
+							</li>
+						</ul>
+						
+						<div class="tab-content">
+						
+							<!-- github authorization page	-->
+							<div id="gistauth" class="tab-pane fade in active">
+								<hr />
+								<div class="row">
+									<div class="col-md-12">
+										<p class="text-center">
+											<i class="fa fa-github-alt fa-3x" aria-hidden="true"></i>
+										</p>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<p class="text-center">
+											<button type="button" class="btn btn-primary text-center start-oauth"
+												onclick="githubAuthorizeOnToken();">
+												Authorization
+											</button>
+										</p>
+									</div>
+								</div>
+								<hr />
+							</div>
+							<!-- github authorization tab end	-->
+							
+							<!-- gist create tab -->
+							<div id="gistcreate" class="tab-pane fade">
+								
+								<div class="modal-body modal-tip">
+									Create a new gist.
+								</div>
+																
+								<!-- input name -->
+								<div class="modal-body">
+									<div class="row modal-sep-line">
+										<div class="input-group">
+											<span class="input-group-addon" id="sizing-addon2">File</span>
+											<input type="text" class="form-control" id="gistCreateFile" 
+												placeholder="filename.swift" aria-describedby="sizing-addon2" />
+										</div>
+									</div>
+								
+									<!-- description -->
+									<div class="row modal-sep-line">
+										<div class="input-group">
+											<span class="input-group-addon" id="sizing-addon2">Desc</span>
+											<input type="text" class="form-control" id="gistCreateDesc" 
+												placeholder="Please type some information." aria-describedby="sizing-addon2" />
+										</div>
+									</div>
+								
+									<!-- public setting -->
+									<div class="row modal-sep-line">
+										<div class="input-group">
+											<span class="input-group-addon model-input-group" id="sizing-addon2">Scope</span>&nbsp;&nbsp;
+											<label class="radio-inline">
+												<input type="radio" name="gistCreateOptions" value="true" checked> Public
+											</label>
+											<label class="radio-inline">
+												<input type="radio" name="gistCreateOptions" value="false"> Secret
+											</label>
+										</div>
+									</div>
+                </div>									
+															
+								<div class="modal-footer">
+									<button type="button" id="gistCreateBtn" class="btn btn-primary" 
+									onclick="startGistCreate();">Create</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+								
+							</div>
+							<!-- gist create tab end -->
+							
+							<!-- gist get tab -->
+							<div id="gistget" class="tab-pane fade">
+								
+								
+								<div class="modal-body modal-tip">
+									Select a gist or its reversions to edit. ( * : Secret )
+								</div>
+								
+								<!-- file list -->
+								
+								<div class="list-group file-list">
+								
+								<!--
+									<a href="#">Item 1</a>
+									<a href="#item-1" class="list-group-item" data-toggle="collapse"><i class="glyphicon glyphicon-chevron-right"></i></a>
+									
+									<div class="list-group collapse" id="item-1">
+										<a href="#" class="list-group-item">Item 1.1</a>
+										<a href="#" class="list-group-item">Item 1.2</a>
+										<a href="#" class="list-group-item">Item 1.3</a>
+									</div>
+								-->
+								
+								</div>
+								
+								<div class="modal-footer">
+									<button type="button" id="gistGetBtn" class="btn btn-primary" 
+									onclick="getContentFromGist();">Get</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+							 
+							</div>
+							<!-- gist get tab end -->
+							
+							<!-- gist edit tab -->
+							<div id="gistedit" class="tab-pane fade">
+								
+								<div class="modal-body modal-tip">
+									Edit a existing gist.
+								</div>
+																
+								<!-- input name -->
+								<div class="modal-body">
+									<div class="row modal-sep-line">
+										<div class="input-group">
+											<span class="input-group-addon" id="sizing-addon2">Gist ID</span>
+											<input type="text" class="form-control" id="gistEditID" 
+												placeholder="sha" aria-describedby="sizing-addon2" disabled />
+										</div>
+									</div>								
+								
+									<div class="row modal-sep-line">
+										<div class="input-group">
+											<span class="input-group-addon" id="sizing-addon2">File name</span>
+											<input type="text" class="form-control" id="gistEditFile" 
+												placeholder="filename.swift" aria-describedby="sizing-addon2" />
+										</div>
+									</div>
+								
+									<!-- description -->
+									<div class="row modal-sep-line">
+										<div class="input-group">
+											<span class="input-group-addon" id="sizing-addon2">Description</span>
+											<input type="text" class="form-control" id="gistEditDesc" 
+												placeholder="Please type some information." aria-describedby="sizing-addon2" />
+										</div>
+									</div>
+									
+									<!-- delete options -->
+									<div class="row modal-sep-line">
+										<span class="input-group-addon model-input-group gist-edit-delete" id="sizing-addon2">Delete (optional) : Occurs when filename is changed.</span>
+										<div class="input-group">
+											<span class="input-group-addon model-input-group" id="sizing-addon2"></span>
+											<label class="radio">
+												<input type="radio" name="gistEditOptions" value="delete"> Delete the old filename file
+											</label>
+											<label class="radio">
+												<input type="radio" name="gistEditOptions" value="keep" checked> Keep the old filename file
+											</label>
+										</div>
+									</div>
+									
+                </div>									
+															
+								<div class="modal-footer">
+									<button type="button" id="gistEditBtn" class="btn btn-primary" 
+									onclick="startGistEdit();">Edit</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+								
+							</div>
+							<!-- gist edit tab end -->
+							
+							<!-- gist fork tab -->
+							<div id="gistfork" class="tab-pane fade">
+								
+								<div class="modal-body modal-tip">
+									Fork a gist from another one.
+								</div>
+																
+								<!-- known id -->
+								<div class="modal-body">
+									<div class="row modal-sep-line">
+										<div class="input-group">
+											<span class="input-group-addon" id="sizing-addon2">Gist ID (First)</span>
+											<input type="text" class="form-control" id="gistForkID" 
+												placeholder="abcdefghijklmnopqrstuvwxyz012345" aria-describedby="sizing-addon2" />
+										</div>
+									</div>
+								
+									<!-- url -->
+									<div class="row modal-sep-line">
+										<div class="input-group">
+											<span class="input-group-addon" id="sizing-addon2">Url</span>
+											<input type="text" class="form-control" id="gistForkUrl" 
+												placeholder="https://gist.github.com/user/abcdefghijklmnopqrstuvwxyz012345" aria-describedby="sizing-addon2" />
+										</div>
+									</div>
+                </div>									
+															
+								<div class="modal-footer">
+									<button type="button" id="gistForkBtn" class="btn btn-primary" 
+									onclick="startGistFork();">Fork</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+								
+							</div>
+							<!-- gist fork tab end -->
+							
+							<!-- gist delete tab -->				
+							<div id="gistdelete" class="tab-pane fade">
+								
+								<div class="modal-body modal-tip">
+									Select a gist to delete. (Include its all reversions.)
+								</div>
+								
+								<!-- file list -->
+								<div class="list-group file-list"></div>
+								
+								<div class="row modal-sep-line">
+									<span class="input-group-addon model-input-group gist-edit-delete" id="sizing-addon2">
+									<label class="checkbox-inline"><input type="checkbox" value="true">Yes! I am sure to delete a gist, including its all reversions.</label>
+									</span>
+									
+								</div>
+								
+								<div class="modal-footer">
+									<button type="button" id="gistDeleteBtn" class="btn btn-danger" 
+									onclick="startGistDelete();">Delete</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+							 
+							</div>
+							<!-- gist delete tab end -->
+							
+						</div>
+						
+					</div>
+					<!-- end of Github -->
+					
+				</div>
+			</div>
+			
+    </div>
+  </div>
+</div>
+
+<script src="/resource/jquery/1.12.4/jquery-1.12.4.min.js" type="text/javascript" charset="utf-8"></script>	
+<script src="/resource/seed/javascript/Common.js" type="text/javascript" charset="utf-8"></script>	
+<script src="/resource/seed/javascript/TimeCounter.js" type="text/javascript" charset="utf-8"></script>		
+<script src="/resource/seed/javascript/JqueryExtends.js" type="text/javascript" charset="utf-8"></script>
+<script src="/resource/seed/javascript/network.js" type="text/javascript" charset="utf-8"></script>		
+<script src="/resource/ace/1.2.6/src/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="/resource/bootstrap-select/1.11.2/dist/js/bootstrap-select.js" type="text/javascript" charset="utf-8"></script>
+<script src="/resource/base64/1.0/Base64.js" type="text/javascript" charset="utf-8"></script>
+<script src="/resource/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/resource/codein/0.0.1/dropboxapi.js" type="text/javascript" charset="utf-8"></script>
+<script src="/resource/codein/0.0.1/gistapi.js" type="text/javascript" charset="utf-8"></script>
+<script src="/resource/codein/0.0.1/general.js" type="text/javascript" charset="utf-8"></script>
+	
+</body>
+</html>
