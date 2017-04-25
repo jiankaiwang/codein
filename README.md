@@ -8,7 +8,9 @@ CodeIn is a web-based Swift IDE and was developed under PHP 7.0 and Apache 2. It
 
 [![Codein Operation](https://raw.githubusercontent.com/jiankaiwang/codein/master/docs/images/codein_v1.gif)](http://www.youtube.com/watch?v=TNa7d47sIzc "CodeIn")
 
-## Docker
+## CodeIn on Docker
+
+**Install `docker` first. Please refer to the page [https://www.docker.com/get-docker](https://www.docker.com/get-docker). The Docker Community Edition (docker-ce) is enough for the codein app.**
 
 The Dockerfile of Codein is hosted on [Github](https://github.com/jiankaiwang/codein) and [docker hub](https://hub.docker.com/r/jiankaiwang/codein/).
 
@@ -29,6 +31,39 @@ sudo docker run -d -p 12280:80 --name codein jiankaiwang/codein:latest
 # stop CodeIn
 sudo docker stop codein
 ```
+
+* CodeIn in Windows 10 (On the `PowerShell`)
+
+```bash
+# pull the image from docker hub
+docker pull jiankaiwang/codein:latest
+
+# start the service 
+# -d : run as the daemon
+# -p : port forwarding must be from 12280 (host) to 80 (container)
+# --name : container name
+docker run -d -p 12280:80 --name codein jiankaiwang/codein:latest
+
+# stop CodeIn
+docker stop codein
+```
+
+* CodeIn in Windows 10 (on the `Kitematic` service)
+
+	* download the kitematic first (right click the docker icon on the bottom right corner of the screen and choose `Kitematic`)
+	* Unzip the compressed file (default name is Kitematic-Windows.zip)
+	* Click `Kitematic.exe`
+	* [Optional] Login the dockerhub account or skip this step
+	* Type `jiankaiwang/codein` on the search bar (on the top of the service)
+	* Click button `CREATE`
+	* After creating the container (showing `RUNNING` on the top), you have to establish the port forwarding.
+	* Click `Settings` on the top right of the Kitematic service.
+	* Click `Hostname/Ports` on the menu.
+	* [Notice] Type `80` on the `DOCKER PORT`, `12280` on the `PUBLISHED IP:PORT` and click `+` to add the rule 
+	* [Notice] You could modify the rule if it is already established on docker port 80.
+	* Service is now starting.
+	* You could stop the service by clicking button `STOP` on the top of kitematic service.
+	
 
 * CodeIn in Windows 7/8 Toolbox (On the `Docker Quickstart Terminal`)
 

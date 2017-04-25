@@ -5,7 +5,6 @@ MAINTAINER JianKai Wang <GLjankai@gmail.com>
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
     apt-get install -y \
-      apache2 \
       php7.0 \
       php7.0-cli \
       libapache2-mod-php7.0 \
@@ -18,6 +17,7 @@ RUN apt-get update && \
       php7.0-xsl \
       php7.0-zip \
       php-curl \
+      apache2 \
       wget \
       unzip
 
