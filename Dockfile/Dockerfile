@@ -28,10 +28,15 @@ RUN wget https://codeload.github.com/jiankaiwang/codein/zip/master && \
     unzip master && \
     mv codein-master/* ./ && \
     rm -rf master ./codein-master && \
+    mkdir /var/tmp/api && \
+    chmod 777 -R /var/tmp/api && \
     ln -s /var/www/html/index.html /var/tmp/index.html && \
     ln -s /var/www/html/example /var/tmp/example && \
-    ln -s /var/www/html/api /var/tmp/api && \
     ln -s /var/www/html/resource /var/tmp/resource && \
+    ln -s /var/www/html/api/CRUD.php /var/tmp/api/ && \
+    ln -s /var/www/html/api/DropboxAPI.php /var/tmp/api/ && \
+    ln -s /var/www/html/api/GistAPI.php /var/tmp/api/ && \
+    ln -s /var/www/html/api/exec.php /var/tmp/api/ && \
     chmod 755 -R /usr/lib/swift
 
 WORKDIR /var/tmp
