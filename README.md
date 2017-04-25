@@ -16,7 +16,7 @@ The Dockerfile of Codein is hosted on [Github](https://github.com/jiankaiwang/co
 
 **Noteic that ip forwaring from host port 12280 to container port 80 can not be changed due to Dropbox and Gist API rule.**
 
-* CodeIn in Linux (On the terminal)
+* CodeIn in Linux (On the `terminal`)
 
 ```bash
 # pull the image from docker hub

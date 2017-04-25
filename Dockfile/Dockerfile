@@ -24,10 +24,10 @@ RUN apt-get update && \
 COPY apache_default.conf /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
-RUN wget https://codeload.github.com/jiankaiwang/codein/zip/version/1 && \
-    unzip 1 && \
-    mv codein-version-1/* ./ && \
-    rm -rf 1 ./codein-version-1 && \
+RUN wget https://codeload.github.com/jiankaiwang/codein/zip/master && \
+    unzip master && \
+    mv codein-master/* ./ && \
+    rm -rf master ./codein-master && \
     ln -s /var/www/html/index.html /var/tmp/index.html && \
     ln -s /var/www/html/example /var/tmp/example && \
     ln -s /var/www/html/api /var/tmp/api && \
