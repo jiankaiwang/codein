@@ -1,25 +1,46 @@
-FROM swift:3.0.2
+FROM ubuntu:18.04
 
 MAINTAINER JianKai Wang <GLjankai@gmail.com>
 
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
-    apt-get install -y \
-      php7.0 \
-      php7.0-cli \
-      libapache2-mod-php7.0 \
-      php7.0-gd \
-      php7.0-json \
-      php7.0-ldap \
-      php7.0-mbstring \
-      php7.0-mysql \
-      php7.0-xml \
-      php7.0-xsl \
-      php7.0-zip \
-      php-curl \
-      apache2 \
-      wget \
-      unzip
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:ondrej/php && \
+    apt-get update
+
+RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
+    apt-get -q install -y \
+    php7.3 \
+    php-curl \
+    apache2 \
+    wget \
+    curl \
+    unzip
+
+RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
+    apt-get -q update && \
+    apt-get -q install -y \
+    libatomic1 \
+    libcurl4 \
+    libxml2 \
+    libedit2 \
+    libsqlite3-0 \
+    libc6-dev \
+    binutils \
+    libgcc-5-dev \
+    libstdc++-5-dev \
+    libpython2.7 \
+    tzdata \
+    git \
+    pkg-config \
+    && rm -r /var/lib/apt/lists/*
+
+RUN mkdir -p /usr/swift
+
+RUN curl -s https://swift.org/builds/swift-5.1.3-release/ubuntu1804/swift-5.1.3-RELEASE/swift-5.1.3-RELEASE-ubuntu18.04.tar.gz -o swift-5.1.3.tar.gz > /dev/null && \
+    tar zxf swift-5.1.3.tar.gz && \
+    mv swift-5.1.3-RELEASE-ubuntu18.04/usr /usr/swift/swift-5.1.3 && \
+    rm -rf swift-5.1.3.tar.gz swift-5.1.3-RELEASE-ubuntu18.04
 
 COPY apache_default.conf /etc/apache2/sites-available/000-default.conf
 
@@ -36,8 +57,7 @@ RUN wget https://codeload.github.com/jiankaiwang/codein/zip/master && \
     ln -s /var/www/html/api/CRUD.php /var/tmp/api/ && \
     ln -s /var/www/html/api/DropboxAPI.php /var/tmp/api/ && \
     ln -s /var/www/html/api/GistAPI.php /var/tmp/api/ && \
-    ln -s /var/www/html/api/exec.php /var/tmp/api/ && \
-    chmod 755 -R /usr/lib/swift
+    ln -s /var/www/html/api/exec.php /var/tmp/api/
 
 WORKDIR /var/tmp
 EXPOSE 80
