@@ -24,7 +24,7 @@ let fout = fopen(filename, "w")
 let data = "1,3,4,7,-1,5,-10,2,-6,8"
 
 // write out the data
-fwrite(data, 1, data.characters.count, fout)
+fwrite(data, 1, String(data).count, fout)
 fclose(fout)
 
 // output the data
