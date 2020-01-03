@@ -177,6 +177,9 @@ class REQUESTMETHOD {
             case "5.1.3-Release":
               $execBin = $this -> swiftPath["5.1.3-Release"];
               break; 
+            case "4.2.4-Release":
+              $execBin = $this -> swiftPath["4.2.4-Release"];
+              break; 
           }
           
           $execPid = Shell_exec(sprintf("%s > %s 2>&1 & echo $!", $execBin." ".$execFile, $execResFile));
@@ -207,7 +210,7 @@ class REQUESTMETHOD {
     $this -> serverInfo = $getServer;
     $this -> method = strtoupper($getServer['REQUEST_METHOD']);
     $this -> response = array("host" => $getServer['SERVER_NAME'], "uri" => $getServer['REQUEST_URI'], "method" => $getServer['REQUEST_METHOD']);
-    $this -> swiftPath = array("5.1.3-Release" => "/usr/swift/swift-5.1.3/bin/swift");
+    $this -> swiftPath = array("5.1.3-Release" => "/usr/swift/swift-5.1.3/bin/swift", "4.2.4-Release" => "/usr/swift/swift-4.2.4/bin/swift");
     $this -> defaultSwift = $this -> swiftPath["5.1.3-Release"];
 
     # get all headers

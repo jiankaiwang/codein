@@ -37,6 +37,11 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
 
 RUN mkdir -p /usr/swift
 
+RUN curl -s https://swift.org/builds/swift-4.2.4-release/ubuntu1804/swift-4.2.4-RELEASE/swift-4.2.4-RELEASE-ubuntu18.04.tar.gz -o swift-4.2.4.tar.gz > /dev/null && \
+    tar zxf swift-4.2.4.tar.gz && \
+    mv swift-4.2.4-RELEASE-ubuntu18.04/usr /usr/swift/swift-4.2.4 && \
+    rm -rf swift-4.2.4.tar.gz swift-4.2.4-RELEASE-ubuntu18.04
+
 RUN curl -s https://swift.org/builds/swift-5.1.3-release/ubuntu1804/swift-5.1.3-RELEASE/swift-5.1.3-RELEASE-ubuntu18.04.tar.gz -o swift-5.1.3.tar.gz > /dev/null && \
     tar zxf swift-5.1.3.tar.gz && \
     mv swift-5.1.3-RELEASE-ubuntu18.04/usr /usr/swift/swift-5.1.3 && \
