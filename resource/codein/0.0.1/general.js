@@ -219,23 +219,31 @@ function exportFile() {
 function showParas() {
 	// show initial check
 	showExecIcon("init", "on");
+
+  // clear the previous execution result and re-post to the server
+  var sendData = { 
+    "version" : $('#version-selector').val(), 
+    "code" : '',
+    "lang" : $('#language-selector').val()
+  };
 	
 	$.ajax({
 		type: "GET",
 		url: execEnv,
 		dataType: 'json',
-		data: '',
+		data: sendData,
 		timeout: 5000,
 		success: function(data) {
 			showExecIcon("init", "off");
 			
 			if("response" in data && data.response.length > 0) {
-				var showInitCheck = ["Swift Version " + $('#version-selector').val(), $('#env-selector').val()];
+				/*var showInitCheck = ["Swift Version " + $('#version-selector').val(), $('#env-selector').val()];
 				var showResStr = "";
 				for(var i = 0 ; i < showInitCheck.length; i++) {
 					showResStr += showInitCheck[i] + "<br>";
 				}
-				$('#execution_result').html(showResStr);
+				$('#execution_result').html(showResStr);*/
+				$('#execution_result').html(data.response);
 				
 				// set the flag to indicate the execution can begin
 				execEnvAvailableFlag = true;
@@ -364,22 +372,31 @@ function prepareCloudService() {
 $(function() {
 	// initial check and show selected parameters
 	showParas();
-	
+
 	// initialize editor
 	setEditorEnv();
-	
+
 	// activate when editor is edited
 	editor.getSession().on('change', function(e) {
 		// remove the error marker when editing the line
 		removeLineMarker("partial");
 	});
-	
+
 	// initial cloud service
 	initialDropboxService();
 	
 	// initial github service
 	initialGithubService();
-	
-
-	
+		
 });
+
+/*
+ * desc: at the end of all doms ready
+ */
+window.onload = function() {
+  console.log("Window onload starts.");
+
+  $('.version-selector').click(function() {
+    showParas();
+  });
+};

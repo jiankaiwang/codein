@@ -131,6 +131,11 @@ class REQUESTMETHOD {
       } else {
         $this -> response["response"] = "Example file is not existing.";
       } 
+    } else if ( 
+      array_key_exists("version", $_GET)
+    ) {
+      $getData = shell_exec($this -> swiftPath[$_GET["version"]]." --version");
+      $this -> response["response"] = $getData;
     } else {
       $getData = shell_exec($this -> defaultSwift." --version");
       $this -> response["response"] = $getData;
